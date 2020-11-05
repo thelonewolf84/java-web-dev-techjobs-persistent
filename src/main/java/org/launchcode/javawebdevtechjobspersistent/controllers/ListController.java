@@ -1,11 +1,15 @@
 package org.launchcode.javawebdevtechjobspersistent.controllers;
 
 import org.launchcode.javawebdevtechjobspersistent.models.Job;
+import org.launchcode.javawebdevtechjobspersistent.models.data.EmployerRepository;
 import org.launchcode.javawebdevtechjobspersistent.models.data.JobRepository;
+import org.launchcode.javawebdevtechjobspersistent.models.data.SkillRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import org.launchcode.javawebdevtechjobspersistent.models.JobData;
@@ -22,6 +26,12 @@ public class ListController {
     @Autowired
     private JobRepository jobRepository;
 
+    @Autowired
+    private EmployerRepository employerRepository;
+
+    @Autowired
+    private SkillRepository skillRepository;
+
     static HashMap<String, String> columnChoices = new HashMap<>();
 
     public ListController () {
@@ -35,10 +45,14 @@ public class ListController {
     @RequestMapping("")
     public String list(Model model) {
 
+        model.addAttribute("employers", employerRepository.findAll());
+        model.addAttribute("jobs", jobRepository.findAll());
+        model.addAttribute("skills", skillRepository.findAll());
+
         return "list";
     }
 
-    @RequestMapping(value = "jobs")
+    @RequestMapping(value = "jobs", method = {RequestMethod.GET, RequestMethod.POST})
     public String listJobsByColumnAndValue(Model model, @RequestParam String column, @RequestParam String value) {
         Iterable<Job> jobs;
         if (column.toLowerCase().equals("all")){
